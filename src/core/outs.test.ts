@@ -43,6 +43,14 @@ describe('outs', () => {
     expect(names(r.falseOuts)).not.toContain('As');
   });
 
+  it('a card that only pairs the board is not a false out', () => {
+    // Ac/Ad/Ah pair the board ace; T and 4 pair the board too. Only Jd/Jh improve hero (pair of jacks)
+    // and still lose to villain's two pair.
+    const r = computeOuts(parseCards('Js Ks'), parseCards('4s Jc'), parseCards('4d 2c As Ts'));
+    expect(names(r.falseOuts)).toEqual(sorted('Jd Jh'));
+    expect(r.outs).toHaveLength(14);
+  });
+
   it('reports split cards separately and does not count them as outs', () => {
     const r = computeOuts(parseCards('Ac Qc'), parseCards('Ad Qd'), parseCards('Kh Js 2s'));
     expect(r.outs).toHaveLength(0);

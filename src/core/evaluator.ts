@@ -25,6 +25,19 @@ export const CATEGORY_NAMES_PL: readonly string[] = Object.freeze([
   'poker',
 ]);
 
+/** Accusative forms for sentences like "masz parę", "przeciwnik ma fulla". */
+export const CATEGORY_NAMES_PL_ACCUSATIVE: readonly string[] = Object.freeze([
+  'wysoką kartę',
+  'parę',
+  'dwie pary',
+  'trójkę',
+  'strita',
+  'kolor',
+  'fulla',
+  'karetę',
+  'pokera',
+]);
+
 export interface HandEvaluation {
   /** Larger is stronger; equal values are exact ties. */
   value: number;
@@ -53,6 +66,8 @@ for (let m = 0; m < STRAIGHT_HIGH.length; m++) {
   if (high < 0 && (m & wheel) === wheel) high = 3;
   STRAIGHT_HIGH[m] = high;
 }
+
+export const straightHighOfMask = (rankMask: number): number => STRAIGHT_HIGH[rankMask & 0x1fff]!;
 
 /** Packs the n highest ranks of a mask into n nibbles, highest first. */
 function topRanks(mask: number, n: number): number {

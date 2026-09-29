@@ -1,7 +1,7 @@
 import type { Card } from './cards';
-import { assertDistinct, remainingDeck } from './cards';
-import type { HandCategory, HandEvaluation } from './evaluator';
-import { categoryOf, evaluateHand, handValue } from './evaluator';
+import { assertDistinct, rankOf, remainingDeck } from './cards';
+import type { HandEvaluation } from './evaluator';
+import { HandCategory, categoryOf, evaluateHand, handValue } from './evaluator';
 
 export interface OutCard {
   card: Card;
@@ -20,12 +20,26 @@ export interface OutsResult {
   /** Cards after which hero is strictly ahead. */
   outs: OutCard[];
   /**
-   * Cards that give hero a hand strong enough to beat villain's current hand,
-   * but improve villain even more, so hero still loses.
+   * Cards that improve hero's hand (beyond what the board alone makes) to something
+   * that would beat villain's current hand, but improve villain even more, so hero still loses.
    */
   falseOuts: OutCard[];
   /** Cards after which the hands tie. Not counted as outs. */
   splits: OutCard[];
+}
+
+/** Category made by the board cards alone (4 or 5 cards). */
+function boardCategory(board: readonly Card[]): HandCategory {
+  if (board.length >= 5) return categoryOf(handValue(board));
+  // Four cards cannot hold a straight or flush: only rank multiplicities matter.
+  const counts = new Map<number, number>();
+  for (const c of board) counts.set(rankOf(c), (counts.get(rankOf(c)) ?? 0) + 1);
+  const shape = [...counts.values()].sort((a, b) => b - a).join('');
+  if (shape === '4') return HandCategory.Quads;
+  if (shape.startsWith('3')) return HandCategory.Trips;
+  if (shape === '22') return HandCategory.TwoPair;
+  if (shape.startsWith('2')) return HandCategory.Pair;
+  return HandCategory.HighCard;
 }
 
 /** Classifies every unseen card for hero vs a known villain hand on a flop or turn. */
@@ -52,7 +66,7 @@ export function computeOuts(hero: readonly Card[], villain: readonly Card[], boa
     const entry: OutCard = { card, heroCategory: categoryOf(heroValue), villainCategory: categoryOf(villainValue) };
     if (heroValue > villainValue) outs.push(entry);
     else if (heroValue === villainValue) splits.push(entry);
-    else if (heroValue > villainNow.value) falseOuts.push(entry);
+    else if (heroValue > villainNow.value && entry.heroCategory > boardCategory([...board, card])) falseOuts.push(entry);
   }
 
   return {

@@ -1,0 +1,506 @@
+:root {
+  --bg: #0f1f17;
+  --surface: #17301f;
+  --surface-2: #1f3d29;
+  --border: #2d5139;
+  --text: #eef4ef;
+  --muted: #9db8a5;
+  --accent: #f2c14e;
+  --good: #3fb56b;
+  --good-bg: #173f26;
+  --bad: #e5534b;
+  --bad-bg: #4a1d1b;
+  --radius: 14px;
+  --bar-height: 84px;
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+a {
+  color: var(--accent);
+}
+
+button {
+  font: inherit;
+}
+
+h1,
+h2 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px calc(var(--bar-height) + env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ---------- home ---------- */
+
+.home-header {
+  padding: 24px 0 16px;
+}
+
+.home-header h1 {
+  font-size: 1.8rem;
+}
+
+.home-header p {
+  margin: 6px 0 0;
+}
+
+.tool-list {
+  display: grid;
+  gap: 12px;
+}
+
+.tool-tile {
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  min-height: 72px;
+}
+
+.tool-tile strong {
+  font-size: 1.15rem;
+}
+
+.tool-tile span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.tool-tile.disabled {
+  opacity: 0.55;
+}
+
+.tool-tile em {
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-style: normal;
+}
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  display: grid;
+  grid-template-columns: 64px 1fr 96px;
+  align-items: center;
+  min-height: 52px;
+}
+
+.topbar h1 {
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.topbar-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.topbar-link:last-child {
+  justify-content: flex-end;
+}
+
+.topbar-link:first-child {
+  font-size: 1.5rem;
+}
+
+/* ---------- mode picker ---------- */
+
+.mode-picker {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  scrollbar-width: none;
+}
+
+.chip {
+  flex: none;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1b1b1b;
+  font-weight: 600;
+}
+
+/* ---------- task ---------- */
+
+.task-card {
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.task-type {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.question {
+  margin: 12px 0 0;
+  font-size: 1.05rem;
+}
+
+.hand-view {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hand-label {
+  width: 84px;
+  flex: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.spot-view {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+/* ---------- playing cards ---------- */
+
+.card-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fbfbf8;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.card-md {
+  width: 46px;
+  height: 64px;
+  font-size: 1.35rem;
+}
+
+.card-sm {
+  width: 34px;
+  height: 46px;
+  font-size: 1rem;
+  border-radius: 6px;
+}
+
+.card-suit {
+  font-size: 1.1em;
+  margin-top: 2px;
+}
+
+.card.spades {
+  color: #1a1a1a;
+}
+.card.hearts {
+  color: #d32f2f;
+}
+.card.diamonds {
+  color: #1565c0;
+}
+.card.clubs {
+  color: #2e7d32;
+}
+
+/* ---------- feedback + explanation ---------- */
+
+.feedback {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid;
+}
+
+.feedback.good {
+  background: var(--good-bg);
+  border-color: var(--good);
+}
+
+.feedback.bad {
+  background: var(--bad-bg);
+  border-color: var(--bad);
+}
+
+.feedback-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.feedback-answer {
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.explanation {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.explanation h2 {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.explanation p {
+  margin: 8px 0;
+}
+
+.formula {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  background: var(--surface-2);
+  padding: 8px 10px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.card-group {
+  margin: 12px 0;
+}
+
+.card-group-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* ---------- bottom action bar (thumb zone) ---------- */
+
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: rgb(15 31 23 / 0.96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+
+.action-bar > * {
+  max-width: 528px;
+  margin: 0 auto;
+}
+
+.answer-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Implied odds has three controls: "Nie da się" drops to its own row when space is short. */
+.answer-form .btn.secondary {
+  flex: 1 1 auto;
+}
+
+.trainer {
+  --bar-height: 150px;
+}
+
+.answer-field {
+  flex: 1 1 140px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.answer-field:focus-within {
+  border-color: var(--accent);
+}
+
+.answer-field input {
+  flex: 1;
+  min-width: 0;
+  height: 54px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.3rem;
+  outline: none;
+}
+
+.affix {
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.btn {
+  min-height: 54px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: #1b1b1b;
+}
+
+.btn.secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn.danger {
+  background: var(--bad);
+  color: #fff;
+}
+
+.btn.wide {
+  width: 100%;
+  display: block;
+}
+
+.btn-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ---------- stats ---------- */
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: grid;
+  gap: 12px;
+}
+
+.stats-item {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.stats-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stats-acc {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.bar {
+  height: 8px;
+  margin: 10px 0 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--good);
+}
+
+.stats-meta {
+  font-size: 0.85rem;
+}
+
+.reset-area {
+  margin-top: 24px;
+}
+
+/* ---------- very narrow phones ---------- */
+
+@media (max-width: 360px) {
+  .hand-label {
+    width: 64px;
+  }
+
+  .card-md {
+    width: 38px;
+    height: 54px;
+    font-size: 1.15rem;
+  }
+}
