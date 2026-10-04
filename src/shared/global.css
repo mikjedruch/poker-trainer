@@ -153,12 +153,20 @@ h2 {
 
 /* ---------- mode picker ---------- */
 
+/* Phone: one row, swiped sideways. Mouse: no swipe, so every chip wraps into view. */
 .mode-picker {
   display: flex;
   gap: var(--space-2);
   overflow-x: auto;
   padding: var(--space-1) 0 var(--space-3);
   scrollbar-width: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mode-picker {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
 }
 
 .chip {
@@ -545,6 +553,51 @@ h2 {
   overflow: hidden;
   white-space: nowrap;
   transition: background-color var(--duration-fast), border-color var(--duration-fast);
+}
+
+.answer-value {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Caret and keyboard hint only matter with a physical keyboard (see the pointer media query). */
+.answer-display .caret {
+  display: none;
+  width: var(--caret-width);
+  height: 1.1em;
+  margin: 0 var(--space-1) 0 1px;
+  background: currentColor;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.pad-hint {
+  display: none;
+  margin: 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Computer with a mouse: type on the real keyboard, so the on-screen keys would only cover the task. */
+@media (hover: hover) and (pointer: fine) {
+  .pad-keys {
+    display: none;
+  }
+
+  .pad-hint {
+    display: block;
+  }
+
+  .answer-display .caret {
+    display: inline-block;
+  }
 }
 
 .answer-display .placeholder {

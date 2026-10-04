@@ -218,10 +218,15 @@ export function MathTrainer() {
         ) : (
           <div className="number-pad">
             <NumberPad onKey={pressKey} decimals={decimals} />
+            <p className="pad-hint">Wpisz z klawiatury, Enter = Sprawdź</p>
             <div className="bar-row">
               <div className="answer-display" aria-label="Twoja odpowiedź" aria-live="polite">
                 {kind === 'dollars' && <span className="affix">$</span>}
-                {input === '' ? <span className="placeholder">{PLACEHOLDERS[kind]}</span> : <span>{input}</span>}
+                <span className="answer-value">
+                  {input}
+                  <span className="caret" aria-hidden="true" />
+                  {input === '' && <span className="placeholder">{PLACEHOLDERS[kind]}</span>}
+                </span>
                 {kind === 'percent' && <span className="affix">%</span>}
               </div>
               {kind === 'dollars' && (
