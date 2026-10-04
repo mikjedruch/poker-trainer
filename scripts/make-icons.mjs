@@ -1,9 +1,9 @@
-// Generates PWA icons (white spade on felt green) without any image dependencies.
+// Generates PWA icons (white spade on graphite) without any image dependencies.
 // Run: npm run icons
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
-const BG = [15, 31, 23];
+const BG = [21, 23, 27]; // --color-bg (dark) in src/shared/theme.css
 const FG = [242, 239, 228];
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {

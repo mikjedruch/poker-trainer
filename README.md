@@ -8,6 +8,9 @@ Działa w przeglądarce i na telefonie (można ją zainstalować jako aplikację
 - **Matematyka** — 7 typów zadań: outy, equity, pot odds, call/fold, MDF, bluff, implied odds.
   Po każdej odpowiedzi wyjaśnienie z podstawionymi liczbami. Statystyki trafności;
   w trybie „Mieszane” częściej losują się typy, w których robisz więcej błędów.
+- **Wygląd** — ciemny motyw (domyślny) albo jasny, talia 4-kolorowa (domyślna) albo 2-kolorowa:
+  przełączniki w **Ustawieniach** na ekranie głównym. Duże karty, odpowiedzi wpisywane na dużej klawiaturze
+  na dole ekranu, „Dalej” w tym samym miejscu co przycisk odpowiedzi.
 
 ## Uruchomienie lokalnie
 

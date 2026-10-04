@@ -22,7 +22,7 @@ export function MathStats() {
   return (
     <div className="page">
       <header className="topbar">
-        <a className="topbar-link" href={href('/math')} aria-label="Wróć do zadań">
+        <a className="topbar-link back" href={href('/math')} aria-label="Wróć do zadań">
           ←
         </a>
         <h1>Statystyki</h1>

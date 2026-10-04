@@ -1,4 +1,5 @@
 import { href, useHashPath } from './shared/router';
+import { SettingsPage } from './shared/SettingsPage';
 import { MathTrainer } from './tools/math/MathTrainer';
 import { MathStats } from './tools/math/MathStats';
 
@@ -13,8 +14,10 @@ function Home() {
   return (
     <main className="page">
       <header className="home-header">
-        <h1>Trener pokera</h1>
-        <p className="muted">Live 6-max NLHE · blindy $1/$2 · stack $200</p>
+        <div>
+          <h1>Trener pokera</h1>
+          <p className="muted">Live 6-max NLHE · blindy $1/$2 · stack $200</p>
+        </div>
       </header>
       <nav className="tool-list">
         {TOOLS.map((tool) =>
@@ -31,6 +34,10 @@ function Home() {
             </div>
           ),
         )}
+        <a className="tool-tile secondary" href={href('/settings')}>
+          <strong>Ustawienia</strong>
+          <span>Motyw jasny/ciemny, talia 4- lub 2-kolorowa</span>
+        </a>
       </nav>
     </main>
   );
@@ -40,5 +47,6 @@ export function App() {
   const path = useHashPath();
   if (path === '/math') return <MathTrainer />;
   if (path === '/math/stats') return <MathStats />;
+  if (path === '/settings') return <SettingsPage />;
   return <Home />;
 }

@@ -1,0 +1,179 @@
+/*
+ * Design tokens. Every colour and size used by the app lives here.
+ * Dark graphite is the default; light is opt-in via <html data-theme="light">.
+ * Four-colour deck is the default; <html data-deck="two"> switches to the classic two colours.
+ * Keep --color-bg in sync with the theme-color literals in index.html and vite.config.ts.
+ */
+
+:root {
+  /* ---------- colours: dark (default) ---------- */
+  --color-bg: #15171b;
+  --color-surface: #1e2126;
+  --color-surface-2: #282c33;
+  --color-border: #363b44;
+  --color-text: #eceef1;
+  --color-text-muted: #9ca3ad;
+  --color-link: #f2c14e;
+  --color-accent: #f2c14e;
+  --color-on-accent: #1b1b1b;
+  --color-good: #3fb56b;
+  --color-good-bg: #163823;
+  --color-on-good: #ffffff;
+  --color-bad: #e5534b;
+  --color-bad-bg: #45201e;
+  --color-on-bad: #ffffff;
+  --color-bar-bg: rgb(21 23 27 / 0.96);
+  --color-overlay-shadow: rgb(0 0 0 / 0.45);
+
+  /* playing cards: always a white card */
+  --color-card-bg: #ffffff;
+  --color-card-border: rgb(0 0 0 / 0.08);
+  --color-card-shadow: rgb(0 0 0 / 0.45);
+  --color-suit-spades: #1a1a1a;
+  --color-suit-hearts: #d32f2f;
+  --color-suit-diamonds: #1565c0;
+  --color-suit-clubs: #2e7d32;
+
+  /* table schematic */
+  --color-table: #23272e;
+  --color-table-rim: #3a404a;
+  --color-seat: #2d323a;
+  --color-seat-text: #eceef1;
+  --color-seat-hero: #f2c14e;
+  --color-chip: #f2c14e;
+  --color-chip-stripe: #ffffff;
+  --color-chip-edge: #9c7420;
+  --color-dealer: #ffffff;
+  --color-dealer-text: #1b1b1b;
+
+  /* ---------- typography ---------- */
+  --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-base: 17px;
+  --font-size-xs: 0.8rem;
+  --font-size-sm: 0.9rem;
+  --font-size-md: 1.05rem;
+  --font-size-lg: 1.2rem;
+  --font-size-xl: 1.4rem;
+  --font-size-xxl: 1.8rem;
+  --line-height: 1.45;
+
+  /* ---------- spacing ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* ---------- shapes ---------- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --focus-ring: 0 0 0 3px rgb(242 193 78 / 0.55);
+  --shadow-card: 0 1px 3px var(--color-card-shadow);
+  --shadow-bar: 0 -4px 16px var(--color-overlay-shadow);
+
+  /* ---------- layout ---------- */
+  --page-max-width: 560px;
+  --page-gutter: 16px;
+  --panel-padding: 16px;
+  --topbar-height: 52px;
+  --topbar-side: 64px;
+  --topbar-side-wide: 104px;
+  --tile-min-height: 72px;
+
+  /* ---------- controls (thumb zone) ---------- */
+  --control-height: 48px;
+  --control-height-lg: 56px;
+  --key-height: 52px;
+  --chip-height: 40px;
+  --pad-icon-size: 28px;
+
+  /* ---------- cards ---------- */
+  --card-width: 64px;
+  --card-height: 90px;
+  --card-radius: 8px;
+  --card-rank-size: 1.9rem;
+  --card-suit-size: 28px;
+  --card-gap: 6px;
+  --card-inner-gap: 2px;
+  --card-width-sm: 44px;
+  --card-height-sm: 62px;
+  --card-rank-size-sm: 1.3rem;
+  --card-suit-size-sm: 19px;
+
+  /* ---------- table ---------- */
+  --seat-height: 34px;
+  --seat-min-width: 58px;
+  --chip-size: 22px;
+  --dealer-size: 24px;
+  --table-rim-width: 6px;
+  --seat-border-width: 2px;
+  --chip-stripe-width: 3px;
+
+  /* ---------- stats ---------- */
+  --stat-bar-height: 10px;
+
+  /* ---------- motion ---------- */
+  --duration-fast: 120ms;
+  --duration-reveal: 200ms;
+  --easing-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color-scheme: dark;
+}
+
+/* ---------- light theme ---------- */
+
+:root[data-theme='light'] {
+  --color-bg: #f2f3f5;
+  --color-surface: #ffffff;
+  --color-surface-2: #e8eaee;
+  --color-border: #d3d7de;
+  --color-text: #16181c;
+  --color-text-muted: #5a626d;
+  --color-link: #8a5a00;
+  --color-accent: #f2c14e;
+  --color-on-accent: #1b1b1b;
+  --color-good: #1d8a4a;
+  --color-good-bg: #e0f3e7;
+  --color-on-good: #ffffff;
+  --color-bad: #c9332b;
+  --color-bad-bg: #fbe4e2;
+  --color-on-bad: #ffffff;
+  --color-bar-bg: rgb(242 243 245 / 0.96);
+  --color-overlay-shadow: rgb(0 0 0 / 0.12);
+
+  --color-card-border: #c9ced6;
+  --color-card-shadow: rgb(0 0 0 / 0.18);
+
+  --color-table: #dfe3e8;
+  --color-table-rim: #c3c9d1;
+  --color-seat: #ffffff;
+  --color-seat-text: #16181c;
+  --color-seat-hero: #c98a0c;
+  --color-dealer: #ffffff;
+  --color-dealer-text: #1b1b1b;
+
+  --focus-ring: 0 0 0 3px rgb(201 138 12 / 0.45);
+
+  color-scheme: light;
+}
+
+/* ---------- two-colour deck ---------- */
+
+:root[data-deck='two'] {
+  --color-suit-diamonds: var(--color-suit-hearts);
+  --color-suit-clubs: var(--color-suit-spades);
+}
+
+/* ---------- very narrow phones (iPhone SE 1st gen and similar) ---------- */
+
+@media (max-width: 359px) {
+  :root {
+    --page-gutter: 12px;
+    --panel-padding: 10px;
+    --card-gap: 4px;
+  }
+}

@@ -1,10 +1,14 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { AnswerCheck, Task, TaskType, UserAnswer } from '../../core/math/tasks';
 import { TASK_INFO, TASK_TYPES, checkAnswer, generateTask } from '../../core/math/tasks';
 import { createRng, randomSeed } from '../../core/rng';
 import { readJson, writeJson } from '../../shared/storage';
 import { href } from '../../shared/router';
+import { NumberPad } from '../../shared/NumberPad';
+import type { PadKey } from '../../shared/padInput';
+import { applyPadKey, padKeyFromKeyboard } from '../../shared/padInput';
+import { revealAboveBar, useElementHeight, useTapGuard } from '../../shared/actionBar';
 import { parseUserNumber } from './answerInput';
 import { Explanation, HandView, SpotView } from './TaskViews';
 import type { Progress } from './progress';
@@ -54,17 +58,31 @@ function describeAnswer(task: Task, answer: UserAnswer): string {
   }
 }
 
+const PLACEHOLDERS: Record<Task['answer']['kind'], string> = {
+  count: 'liczba outów',
+  percent: 'np. 27.5',
+  dollars: 'kwota',
+  decision: '',
+};
+
 export function MathTrainer() {
   const [progress, setProgress] = useState<Progress>(() => sanitizeProgress(readJson(PROGRESS_KEY)));
   const [mode, setMode] = useState<Mode>(loadMode);
   const [task, setTask] = useState<Task>(() => newTask(mode, progress));
   const [input, setInput] = useState('');
   const [result, setResult] = useState<Result | null>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const revealRef = useRef<HTMLDivElement>(null);
+  const barHeight = useElementHeight(barRef);
+  const guard = useTapGuard();
 
+  const kind = task.answer.kind;
+  const decimals = kind === 'percent';
   const typed = parseUserNumber(input);
 
   function submit(answer: UserAnswer) {
-    if (result) return;
+    if (result || !guard.ready()) return;
+    guard.arm();
     const check = checkAnswer(task, answer);
     const updated = recordResult(progress, task.type, check.correct);
     setProgress(updated);
@@ -72,31 +90,69 @@ export function MathTrainer() {
     setResult({ check, given: describeAnswer(task, answer) });
   }
 
-  function next(nextMode: Mode = mode) {
+  function showTask(nextMode: Mode) {
+    guard.arm();
     setTask(newTask(nextMode, progress));
     setInput('');
     setResult(null);
     window.scrollTo(0, 0);
   }
 
+  function next() {
+    if (guard.ready()) showTask(mode);
+  }
+
   function changeMode(m: Mode) {
     setMode(m);
     writeJson(MODE_KEY, m);
-    next(m);
+    showTask(m);
   }
 
-  function onSubmitNumber(e: FormEvent) {
-    e.preventDefault();
+  function pressKey(key: PadKey) {
+    setInput((text) => applyPadKey(text, key, { decimals }));
+  }
+
+  function submitTyped() {
     if (typed !== null) submit({ kind: 'number', value: typed });
   }
 
+  // Physical keyboard (desktop): digits, comma/point, Backspace, Enter.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (result) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          next();
+        }
+        return;
+      }
+      if (kind === 'decision') return;
+      const key = padKeyFromKeyboard(e.key);
+      if (key) {
+        e.preventDefault();
+        pressKey(key);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        submitTyped();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+
+  // After answering: make sure the verdict and the start of the explanation are on screen.
+  useEffect(() => {
+    if (result && revealRef.current) revealAboveBar(revealRef.current, barRef.current);
+  }, [result]);
+
   const info = TASK_INFO[task.type];
-  const kind = task.answer.kind;
+  const pageStyle = { '--bar-space': `${barHeight}px` } as CSSProperties;
 
   return (
-    <div className="page trainer">
+    <div className="page trainer" style={pageStyle}>
       <header className="topbar">
-        <a className="topbar-link" href={href('/')} aria-label="Wróć do menu">
+        <a className="topbar-link back" href={href('/')} aria-label="Wróć do menu">
           ←
         </a>
         <h1>Matematyka</h1>
@@ -126,52 +182,58 @@ export function MathTrainer() {
       </section>
 
       {result && (
-        <section className={result.check.correct ? 'feedback good' : 'feedback bad'} aria-live="polite">
-          <div className="feedback-title">{result.check.correct ? '✓ Dobrze' : '✗ Źle'}</div>
-          <div>Twoja odpowiedź: {result.given}</div>
-          <div className="feedback-answer">{result.check.answerText}</div>
-        </section>
+        <div className="reveal" ref={revealRef}>
+          <section className={result.check.correct ? 'feedback good' : 'feedback bad'}>
+            <div className="feedback-title">{result.check.correct ? '✓ Dobrze' : '✗ Źle'}</div>
+            <div>Twoja odpowiedź: {result.given}</div>
+            <div className="feedback-answer">{result.check.answerText}</div>
+          </section>
+          <Explanation blocks={task.explanation} />
+        </div>
       )}
-      {result && <Explanation blocks={task.explanation} />}
 
-      <div className="action-bar">
+      <div className="action-bar" ref={barRef}>
         {result ? (
-          <button className="btn primary wide" onClick={() => next()}>
-            Następne zadanie →
-          </button>
+          <div className="bar-row">
+            <div
+              className={`answer-display choice ${result.check.correct ? 'good' : 'bad'}`}
+              role="status"
+              aria-label={`${result.check.correct ? 'Dobrze' : 'Źle'}: ${result.given}`}
+            >
+              {result.check.correct ? '✓' : '✗'} {result.given}
+            </div>
+            <button className="btn primary" onClick={next}>
+              Dalej →
+            </button>
+          </div>
         ) : kind === 'decision' ? (
-          <div className="btn-pair">
-            <button className="btn danger" onClick={() => submit({ kind: 'fold' })}>
+          <div className="bar-row">
+            <button className="btn secondary choice" onClick={() => submit({ kind: 'fold' })}>
               FOLD
             </button>
-            <button className="btn primary" onClick={() => submit({ kind: 'call' })}>
+            <button className="btn secondary choice" onClick={() => submit({ kind: 'call' })}>
               CALL
             </button>
           </div>
         ) : (
-          <form className="answer-form" onSubmit={onSubmitNumber}>
-            <label className="answer-field">
-              {kind === 'dollars' && <span className="affix">$</span>}
-              <input
-                inputMode={kind === 'count' ? 'numeric' : 'decimal'}
-                enterKeyHint="done"
-                autoComplete="off"
-                placeholder={kind === 'count' ? 'liczba outów' : kind === 'dollars' ? 'kwota' : 'np. 27.5'}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                aria-label="Twoja odpowiedź"
-              />
-              {kind === 'percent' && <span className="affix">%</span>}
-            </label>
-            <button className="btn primary" type="submit" disabled={typed === null}>
-              Sprawdź
-            </button>
-            {kind === 'dollars' && (
-              <button className="btn secondary" type="button" onClick={() => submit({ kind: 'impossible' })}>
-                Nie da się
+          <div className="number-pad">
+            <NumberPad onKey={pressKey} decimals={decimals} />
+            <div className="bar-row">
+              <div className="answer-display" aria-label="Twoja odpowiedź" aria-live="polite">
+                {kind === 'dollars' && <span className="affix">$</span>}
+                {input === '' ? <span className="placeholder">{PLACEHOLDERS[kind]}</span> : <span>{input}</span>}
+                {kind === 'percent' && <span className="affix">%</span>}
+              </div>
+              {kind === 'dollars' && (
+                <button className="btn secondary" onClick={() => submit({ kind: 'impossible' })}>
+                  Nie da się
+                </button>
+              )}
+              <button className="btn primary" disabled={typed === null} onClick={submitTyped}>
+                Sprawdź
               </button>
-            )}
-          </form>
+            </div>
+          </div>
         )}
       </div>
     </div>

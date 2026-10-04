@@ -7,17 +7,19 @@ import { CardRow } from '../../shared/PlayingCard';
 export function HandView({ hand }: { hand: DrawSpot }) {
   return (
     <div className="hand-view">
-      <div className="hand-row">
-        <span className="hand-label">Ty</span>
-        <CardRow cards={hand.hero} />
+      <div className="hand-pair">
+        <div className="hand-block">
+          <span className="hand-label hero">Ty</span>
+          <CardRow cards={hand.hero} />
+        </div>
+        <div className="hand-block">
+          <span className="hand-label">Przeciwnik</span>
+          <CardRow cards={hand.villain} />
+        </div>
       </div>
-      <div className="hand-row">
+      <div className="hand-block">
         <span className="hand-label">{hand.street === 'flop' ? 'Flop' : 'Turn'}</span>
         <CardRow cards={hand.board} />
-      </div>
-      <div className="hand-row">
-        <span className="hand-label">Przeciwnik</span>
-        <CardRow cards={hand.villain} />
       </div>
     </div>
   );
