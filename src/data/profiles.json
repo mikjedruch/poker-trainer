@@ -1,0 +1,35 @@
+{
+  "about": "Opponent profiles for the postflop trainer. Each profile gives the villain's preflop calling ranges; the hero's ranges always come from preflop.json. A range written as \"@SCENARIO.call\" reuses that scenario's call range from preflop.json. Edit ranges here; the code only reads them.",
+  "profiles": [
+    {
+      "id": "baseline",
+      "name": "Baseline",
+      "ranges": {
+        "bbVsEarly": "@BB_VS_EARLY.call",
+        "bbVsLate": "@BB_VS_LATE.call",
+        "ccVsEarly": "@VS_EARLY_IP.call",
+        "ccVsLate": "@VS_LATE_BTN.call"
+      },
+      "assumptions": {
+        "callsTooMuch": false,
+        "text": "gra jak zakresy bazowe"
+      },
+      "source": "preflop-v1"
+    },
+    {
+      "id": "loose-live",
+      "name": "Loose live",
+      "ranges": {
+        "bbVsEarly": "22-JJ, A2s-AQs, K2s+, Q4s+, J6s+, T6s+, 96s+, 85s+, 74s+, 63s+, 53s+, 43s, A2o-AQo, K7o+, Q8o+, J8o+, T8o+, 97o+, 87o, 76o, 65o",
+        "bbVsLate": "22-JJ, A2s-AQs, K2s+, Q4s+, J6s+, T6s+, 96s+, 85s+, 74s+, 63s+, 53s+, 43s, A2o-AQo, K7o+, Q8o+, J8o+, T8o+, 97o+, 87o, 76o, 65o",
+        "ccVsEarly": "22-JJ, A2s-AQs, K8s+, Q9s+, J9s+, T8s+, 97s+, 86s+, 75s+, 65s, 54s, A9o-AQo, KTo+, QTo+, JTo, T9o, 98o",
+        "ccVsLate": "22-JJ, A2s-AQs, K8s+, Q9s+, J9s+, T8s+, 97s+, 86s+, 75s+, 65s, 54s, A9o-AQo, KTo+, QTo+, JTo, T9o, 98o"
+      },
+      "assumptions": {
+        "callsTooMuch": true,
+        "text": "za często sprawdza postflop, rzadko blefuje"
+      },
+      "source": "assumption-v1"
+    }
+  ]
+}

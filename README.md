@@ -20,6 +20,19 @@ Działa w przeglądarce i na telefonie (można ją zainstalować jako aplikację
   - **Statystyki**: trafność dla każdego rodzaju sytuacji i każdej pozycji.
 
   Zakresy i kwoty są w pliku `src/data/preflop.json` — można je poprawiać bez zmian w kodzie.
+- **Postflop** — c-bet na flopie, gdy otworzyłeś preflop. Cztery zakładki:
+  - **Quiz**: tekstura flopu (kolory, wysokość, suchy/mokry), strategia c-betu dla całego zakresu,
+    decyzja konkretną ręką (check / bet z kwotą) i sizing (odsetek blefów albo MDF). Częściej losują się
+    rodzaje zadań i sytuacje, w których robisz błędy.
+  - **Analiza**: dowolny flop — tekstura, dokładne equity zakresów (E), przewaga silnych rąk (N), strategia,
+    rozkład rąk obu graczy, siatka Twoich decyzji, porównanie z profilem baseline i suwak rozmiaru betu.
+  - **Profile**: przeciwnicy `baseline` i `loose-live` oraz własne kopie. Zakresy przeciwnika edytujesz palcem
+    na siatce albo notacją; aktywny profil działa w quizie i w analizie.
+  - **Statystyki**: trafność dla każdego rodzaju zadania i każdej sytuacji.
+
+  Liczby są dokładne (liczone w tle, bez blokowania ekranu); strategia to heurystyka „reguła bazowa v1”.
+  Profile są w `src/data/profiles.json`. Do quizu przy budowaniu liczy się biblioteka 150 flopów
+  (`npm run precompute`, kilka minut; pomijana, gdy zakresy się nie zmieniły).
 - **Wygląd** — ciemny motyw (domyślny) albo jasny, talia 4-kolorowa (domyślna) albo 2-kolorowa:
   przełączniki w **Ustawieniach** na ekranie głównym. Duże karty, odpowiedzi wpisywane na dużej klawiaturze
   na dole ekranu, „Dalej” w tym samym miejscu co przycisk odpowiedzi.
@@ -31,7 +44,7 @@ Wymaga Node.js 20 lub nowszego.
 ```
 npm install
 npm run dev        # aplikacja na http://localhost:5173/poker-trainer/
-npm test           # wszystkie testy (ok. 20 s)
+npm test           # wszystkie testy (ok. 1 min)
 npm run build      # wersja produkcyjna do katalogu dist/
 npm run preview    # podgląd wersji produkcyjnej
 ```

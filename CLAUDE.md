@@ -235,3 +235,137 @@ Każde wyjaśnienie kończ zdaniem o pozycji, jeśli w scenariuszu bohater jest 
 - Testy danych przechodzą (tabela kombinacji wyżej).
 - Drill generuje tylko spójne sytuacje (test na 10 000 losowań: pozycje, limperzy, kwoty, ręka z dozwolonego zakresu w VS3B).
 - Wygląd zgodny z Etapem 1.5, wdrożone na GitHub Pages.
+
+---
+
+## Etap 3 — postflop (`src/tools/postflop`)
+
+Bohater jest agresorem preflop i decyduje o c-becie na flopie. Zasada: wszystko, co da się policzyć, liczy `src/core`.
+Heurystyczna jest tylko reguła decyzji (sekcja 3.4) i jest tak oznaczona w interfejsie.
+
+### 3.1 Profile przeciwników
+
+Zakres bohatera zawsze pochodzi z Etapu 2. Zakres przeciwnika pochodzi z wybranego profilu.
+Profile trzymaj jako dane (`src/data/profiles.json`) z polami `id`, `name`, `ranges`, `assumptions`, `source`.
+
+| Profil | Obrona BB przeciw openowi | Cold call w pozycji | Założenie behawioralne |
+|---|---|---|---|
+| `baseline` | BB_VS_EARLY / BB_VS_LATE (call) z Etapu 2 | VS_EARLY_IP / VS_LATE_BTN (call) z Etapu 2 | gra jak zakresy bazowe |
+| `loose-live` | 22-JJ, A2s-AQs, K2s+, Q4s+, J6s+, T6s+, 96s+, 85s+, 74s+, 63s+, 53s+, 43s, A2o-AQo, K7o+, Q8o+, J8o+, T8o+, 97o+, 87o, 76o, 65o | 22-JJ, A2s-AQs, K8s+, Q9s+, J9s+, T8s+, 97s+, 86s+, 75s+, 65s, 54s, A9o-AQo, KTo+, QTo+, JTo, T9o, 98o | za często sprawdza postflop, rzadko blefuje |
+
+Oba profile `loose-live` mają `source: "assumption-v1"`. Test: 648 kombinacji (obrona BB) i 328 (cold call).
+
+**Profil własny:** użytkownik może skopiować dowolny profil i edytować zakresy na siatce 13×13 (malowanie palcem)
+albo wpisując notację. Zapis w localStorage. To jest główny sposób dopasowania narzędzia do konkretnych stołów.
+
+### 3.2 Scenariusze (wersja 1)
+
+| ID | Preflop | Pozycja bohatera po flopie |
+|---|---|---|
+| P1 | RFI_UTG, call z BB | w pozycji |
+| P2 | RFI_CO, call z BB | w pozycji |
+| P3 | RFI_BTN, call z BB | w pozycji |
+| P4 | RFI_UTG, cold call z BTN | bez pozycji |
+| P5 | RFI_CO, cold call z BTN | bez pozycji |
+| PM | open bohatera + 2 callerów | multiway, tylko reguła z 3.4, bez obliczeń zakresów |
+
+### 3.3 Obliczenia (`src/core/postflop.ts`)
+
+**Tekstura flopu** — deterministyczna:
+- `paired`, `suits` (rainbow / two-tone / monotone), `height` według najwyższej karty: wysoki (A, K, Q), średni (J, T, 9), niski (8 i niżej);
+- `straightPairs`: liczba par różnych rang (r1 < r2), które z flopem dają strit;
+- `oesdPairs`: liczba par rang bez stritu, przy których ≥ 2 różne rangi kończą strit (OESD lub double gutshot);
+- `wet` = nie rainbow LUB `straightPairs > 0` LUB `oesdPairs ≥ 3`; inaczej `dry`.
+
+Testy tekstury:
+
+| Flop | suits | straightPairs | oesdPairs | wet | height |
+|---|---|---|---|---|---|
+| Ks 7d 2c | rainbow | 0 | 0 | nie | wysoki |
+| 7h 6h 5c | two-tone | 3 | 21 | tak | niski |
+| Qs Jd Tc | rainbow | 3 | 21 | tak | wysoki |
+| 8s 8d 3c (paired) | rainbow | 0 | 0 | nie | niski |
+| Ah Kh 5c | two-tone | 0 | 0 | tak | wysoki |
+| 9h 8h 4h | monotone | 0 | 3 | tak | średni |
+| Td 6s 2c | rainbow | 0 | 0 | nie | średni |
+
+**Kategorie rąk** (zawsze względem kart z ręki; kombinacje kolidujące z flopem usuwane):
+- `silne`: trójka/set lub lepiej albo dwie pary z użyciem obu kart z ręki;
+- `TP+`: top para lub overpara (para kieszonkowa wyższa niż najwyższa karta flopu); `TP+` zawiera też `silne` w statystykach;
+- `TP dobry kicker`: top para z drugą kartą ≥ T albo overpara;
+- `słabsza para`: każda inna para z udziałem karty z ręki;
+- `draw`: bez pary z kartą z ręki, z flush drawem (4 do koloru) albo OESD/double gutshotem (≥ 2 rangi kończące strit);
+- `nic`: reszta.
+
+**Analiza zakresów** dla scenariusza + profilu + flopu:
+- `E` = dokładne equity zakresu bohatera przeciw zakresowi przeciwnika: enumeracja wszystkich turnów i riverów,
+  każda trójka (kombinacja bohatera, kombinacja przeciwnika, runout) bez kolizji kart waży tyle samo;
+- `N` = (% `silne` u bohatera) − (% `silne` u przeciwnika), w punktach procentowych;
+- rozkład kategorii dla obu zakresów.
+
+Licz w Web Workerze z paskiem postępu i cache po (scenariusz, profil, flop w postaci kanonicznej kolorów).
+Do quizów wygeneruj w czasie builda (`scripts/precompute-flops.ts`) bibliotekę 150 flopów, losowanych warstwowo po teksturze,
+dla scenariuszy P1–P5 i obu profili, żeby quiz działał natychmiast.
+
+Obowiązkowe testy (wartości dokładne, equity zweryfikowane niezależnym Monte Carlo):
+
+| Flop | Scenariusz | Profil | E % | silne bohater / przeciwnik % | TP+ bohater / przeciwnik % | draw bohater / przeciwnik % |
+|---|---|---|---|---|---|---|
+| Ks 7d 2c | P1 | baseline | 59.87 | 4.2 / 2.9 | 29.6 / 17.1 | 0.0 / 0.0 |
+| Ks 7d 2c | P1 | loose-live | 65.93 | 4.2 / 2.9 | 29.6 / 15.2 | 0.0 / 0.0 |
+| Ks 7d 2c | P3 | baseline | 54.12 | 2.6 / 2.1 | 20.1 / 16.8 | 0.0 / 0.0 |
+| Ks 7d 2c | P3 | loose-live | 54.95 | 2.6 / 2.9 | 20.1 / 15.2 | 0.0 / 0.0 |
+| 7h 6h 5c | P1 | baseline | 50.71 | 4.0 / 9.5 | 31.8 / 25.2 | 10.6 / 13.3 |
+| 7h 6h 5c | P1 | loose-live | 52.91 | 4.0 / 8.4 | 31.8 / 22.9 | 10.6 / 21.0 |
+| 7h 6h 5c | P3 | baseline | 49.57 | 4.6 / 9.2 | 21.1 / 22.3 | 12.2 / 13.1 |
+| 7h 6h 5c | P3 | loose-live | 48.86 | 4.6 / 8.4 | 21.1 / 22.9 | 12.2 / 21.0 |
+
+Tolerancja: equity ±0.01 pp, procenty kategorii ±0.1 pp.
+
+### 3.4 Reguła decyzji (heurystyka, oznaczona w UI jako „reguła bazowa v1”)
+
+**Strategia na boardzie (heads-up):**
+1. `E < 50` lub `N < −3` → **głównie check**;
+2. inaczej, flop `dry` → **częsty mały c-bet (1/3 puli)**;
+3. inaczej (flop `wet`) → **rzadszy duży c-bet (2/3 puli)**.
+
+Oczekiwane wyniki dla tabeli testów: na Ks 7d 2c wszystkie 4 przypadki → mały c-bet; na 7h 6h 5c wszystkie 4 → głównie check.
+
+Rozmiar betu: mały c-bet 1/3 puli, duży c-bet 2/3 puli, multiway 1/2 puli. Przy strategii „głównie check” nieliczne bety
+(silne ręce) idą za 2/3 puli — rzadko betowany, spolaryzowany zakres gra większym betem.
+
+**Decyzja ręką:**
+
+| Kategoria | Mały c-bet | Duży c-bet | Głównie check | Multiway (PM), bet 1/2 puli |
+|---|---|---|---|---|
+| silne | bet | bet | bet | bet |
+| TP dobry kicker | bet | bet | check | bet |
+| TP słaby kicker | bet | baseline: check; loose-live: bet | check | check |
+| słabsza para | bet | check | check | check |
+| draw | bet | bet | check | bet |
+| nic | baseline i w pozycji: bet; loose-live lub bez pozycji: check | check | check | check |
+
+Uzasadnienia do wyjaśnień:
+- przeciw `loose-live` mniej blefów, bo ten profil za często sprawdza; za to cieńsze value (TP słaby kicker przy dużym c-becie);
+- multiway: blef musi przejść przez kilku graczy naraz, więc betujesz tylko ręce mocne i silne drawy;
+- bez pozycji: blef bez pozycji traci więcej, gdy dostaje calla, więc `nic` zawsze check.
+
+### 3.5 Tryby
+
+1. **Analiza flopu:** wybór scenariusza, profilu i flopu (losowy albo wybrany). Pokazuje teksturę, `E`, `N`,
+   rozkład kategorii obu zakresów jako poziome paski, strategię na boardzie i siatkę 13×13 akcji bohatera.
+   Przełącznik profilu pokazuje obok siebie baseline i wybrany profil — tu widać, co zmienia szerszy przeciwnik.
+   Suwak rozmiaru betu 10–200% puli (v1.1) na żywo pokazuje odsetek blefów, MDF przeciwnika i equity wymagane do calla.
+2. **Quiz tekstury:** klasyfikacja flopu (dry/wet, wysokość, kolory).
+3. **Quiz strategii:** flop + scenariusz + profil → wybór jednej z 3 strategii; w wyjaśnieniu `E`, `N` i która reguła zadziałała.
+4. **Quiz ręki:** konkretna ręka → bet/check (i rozmiar); wyjaśnienie: kategoria ręki + wiersz tabeli.
+5. **Sizing (v1.1):** losuj rozmiar s z {1/4, 1/3, 1/2, 2/3, 3/4, 1, 1.5, 2} × pula. Pytaj o odsetek blefów s / (1 + 2s)
+   albo o MDF przeciwnika 1 / (1 + s). Tolerancja ±2 pp. Np. blefy: 1/3 puli → 20%, 1/2 → 25%, 2/3 → 28.6%, pula → 33.3%.
+
+Postępy i losowanie ważone błędami jak w Etapach 1–2.
+
+### Definicja ukończenia
+- Wszystkie testy z tabel przechodzą.
+- Analiza dowolnego flopu w Web Workerze trwa < 5 s na telefonie średniej klasy (zmierz i podaj wynik).
+- Edytor profilu własnego działa i jest używany we wszystkich trybach.
+- Wygląd zgodny z Etapem 1.5, wdrożone na GitHub Pages.

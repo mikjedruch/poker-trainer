@@ -150,3 +150,78 @@ export function gridToCombos(selected: readonly (readonly boolean[])[]): Combo[]
     for (let c = 0; c < 13; c++) if (selected[r]?.[c]) out.push(...classCombos(gridLabel(r, c)));
   return out;
 }
+
+// ---------- whole hand classes ----------
+
+export interface ClassRange {
+  /** Hand classes the range covers completely. */
+  classes: Set<HandClass>;
+  /** Classes the range covers only partly (e.g. "AsKs" alone covers 1 of 4 AKs combos). */
+  partial: HandClass[];
+}
+
+/** Splits a range into fully covered hand classes and partly covered ones. */
+export function classRange(text: string): ClassRange {
+  const counts = new Map<HandClass, number>();
+  for (const combo of parseRange(text)) {
+    const cls = handClassOf(combo);
+    counts.set(cls, (counts.get(cls) ?? 0) + 1);
+  }
+  const classes = new Set<HandClass>();
+  const partial: HandClass[] = [];
+  for (const [cls, n] of counts) {
+    if (n === classCombos(cls).length) classes.add(cls);
+    else partial.push(cls);
+  }
+  return { classes, partial };
+}
+
+/** All combos of the given hand classes, without combos using dead cards. */
+export function classesToCombos(classes: Iterable<HandClass>, dead: readonly Card[] = []): Combo[] {
+  const out: Combo[] = [];
+  for (const cls of classes) out.push(...classCombos(cls));
+  return removeDead(out, dead);
+}
+
+/**
+ * Shortest usual notation for a set of hand classes: "22-JJ, AQs+, A2s-A5s, KTo+".
+ * Pairs first, then suited and offsuit hands by high card. parseRange(formatRange(x)) gives x back.
+ */
+export function formatRange(classes: Iterable<HandClass>): string {
+  const set = new Set(classes);
+  const parts: string[] = [];
+  const r = (rank: number) => RANK_CHARS[rank]!;
+
+  /** Runs of consecutive ranks from `top` down to 0 for which `has` is true, highest first. */
+  const runs = (top: number, has: (rank: number) => boolean): Array<[number, number]> => {
+    const out: Array<[number, number]> = [];
+    let rank = top;
+    while (rank >= 0) {
+      if (!has(rank)) {
+        rank--;
+        continue;
+      }
+      const high = rank;
+      while (rank >= 0 && has(rank)) rank--;
+      out.push([rank + 1, high]);
+    }
+    return out;
+  };
+
+  for (const [low, high] of runs(12, (k) => set.has(r(k) + r(k)))) {
+    if (low === high) parts.push(r(low) + r(low));
+    else if (high === 12) parts.push(`${r(low)}${r(low)}+`);
+    else parts.push(`${r(low)}${r(low)}-${r(high)}${r(high)}`);
+  }
+  for (const kind of ['s', 'o'] as const) {
+    for (let h = 12; h >= 1; h--) {
+      const cls = (k: number) => r(h) + r(k) + kind;
+      for (const [low, high] of runs(h - 1, (k) => set.has(cls(k)))) {
+        if (low === high) parts.push(cls(low));
+        else if (high === h - 1) parts.push(`${cls(low)}+`);
+        else parts.push(`${cls(low)}-${cls(high)}`);
+      }
+    }
+  }
+  return parts.join(', ');
+}

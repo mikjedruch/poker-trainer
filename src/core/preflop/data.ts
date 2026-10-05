@@ -1,6 +1,6 @@
 import rawData from '../../data/preflop.json';
 import type { HandClass } from '../range';
-import { classCombos, gridLabel, handClassOf, parseRange } from '../range';
+import { classCombos, classRange, gridLabel, parseRange } from '../range';
 import type { Position } from '../table';
 
 // Preflop ranges and bet sizes come from src/data/preflop.json; this module validates them
@@ -114,16 +114,9 @@ function positiveInt(value: unknown, name: string): number {
 
 /** Parses a range into whole hand classes; a range that splits a class is an error (strategies are pure). */
 function rangeClasses(text: string, where: string): { classes: Set<HandClass>; combos: number } {
-  const combos = parseRange(text);
-  const counts = new Map<HandClass, number>();
-  for (const c of combos) {
-    const cls = handClassOf(c);
-    counts.set(cls, (counts.get(cls) ?? 0) + 1);
-  }
-  for (const [cls, n] of counts) {
-    if (n !== classCombos(cls).length) throw new Error(`preflop.json ${where}: range covers only part of ${cls}`);
-  }
-  return { classes: new Set(counts.keys()), combos: combos.length };
+  const { classes, partial } = classRange(text);
+  if (partial.length > 0) throw new Error(`preflop.json ${where}: range covers only part of ${partial[0]}`);
+  return { classes, combos: parseRange(text).length };
 }
 
 function loadData() {

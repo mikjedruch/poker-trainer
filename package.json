@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run precompute && tsc && vite build",
     "typecheck": "tsc",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icons": "node scripts/make-icons.mjs"
+    "icons": "node scripts/make-icons.mjs",
+    "precompute": "tsx scripts/precompute-flops.ts"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -20,6 +21,7 @@
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vite": "^6.4.3",
     "vite-plugin-pwa": "^1.3.0",

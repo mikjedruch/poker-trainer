@@ -2,6 +2,11 @@ import { href, useHashPath } from './shared/router';
 import { SettingsPage } from './shared/SettingsPage';
 import { MathTrainer } from './tools/math/MathTrainer';
 import { MathStats } from './tools/math/MathStats';
+import { FlopAnalysis } from './tools/postflop/FlopAnalysis';
+import { PostflopQuiz } from './tools/postflop/PostflopQuiz';
+import { PostflopStats } from './tools/postflop/PostflopStats';
+import { ProfileEditor } from './tools/postflop/ProfileEditor';
+import { ProfilesPage } from './tools/postflop/ProfilesPage';
 import { PreflopDrill } from './tools/preflop/PreflopDrill';
 import { PreflopStats } from './tools/preflop/PreflopStats';
 import { RangeBrowser } from './tools/preflop/RangeBrowser';
@@ -9,7 +14,7 @@ import { RangeBrowser } from './tools/preflop/RangeBrowser';
 const TOOLS = [
   { path: '/math', title: 'Matematyka', description: 'Outy, equity, pot odds, MDF, implied odds', ready: true },
   { path: '/preflop', title: 'Preflop', description: 'Open, limperzy, obrona, 3bety · przeglądarka zakresów', ready: true },
-  { path: '/postflop', title: 'Postflop', description: 'Decyzje na flopie, turnie i riverze', ready: false },
+  { path: '/postflop', title: 'Postflop', description: 'C-bet na flopie: tekstura, strategia, ręce, sizing · analiza flopu · profile', ready: true },
   { path: '/rules', title: 'Zasady', description: 'Przepisy i sytuacje przy stole live', ready: false },
 ];
 
@@ -53,6 +58,11 @@ export function App() {
   if (path === '/preflop') return <PreflopDrill />;
   if (path === '/preflop/zakresy') return <RangeBrowser />;
   if (path === '/preflop/stats') return <PreflopStats />;
+  if (path === '/postflop') return <PostflopQuiz />;
+  if (path === '/postflop/analiza') return <FlopAnalysis />;
+  if (path === '/postflop/profile') return <ProfilesPage />;
+  if (path.startsWith('/postflop/profile/')) return <ProfileEditor id={decodeURIComponent(path.slice('/postflop/profile/'.length))} />;
+  if (path === '/postflop/stats') return <PostflopStats />;
   if (path === '/settings') return <SettingsPage />;
   return <Home />;
 }

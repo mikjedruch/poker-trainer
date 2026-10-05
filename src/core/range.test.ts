@@ -9,6 +9,9 @@ import {
   handClassOf,
   parseRange,
   rangeCombos,
+  classRange,
+  classesToCombos,
+  formatRange,
 } from './range';
 
 const classes = (text: string) => [...new Set(parseRange(text).map(handClassOf))].sort();
@@ -113,5 +116,47 @@ describe('range: 13x13 grid', () => {
     expect(handClassOf(parseCards('Ks As') as [number, number])).toBe('AKs');
     expect(handClassOf(parseCards('Kd As') as [number, number])).toBe('AKo');
     expect(handClassOf(parseCards('7d 7c') as [number, number])).toBe('77');
+  });
+});
+
+describe('range: whole classes and formatting', () => {
+  it('splits whole and partial classes', () => {
+    const r = classRange('AKs, QQ, AsKd, Th9h');
+    expect([...r.classes].sort()).toEqual(['AKs', 'QQ']);
+    expect(r.partial.sort()).toEqual(['AKo', 'T9s']);
+  });
+
+  it('formats ranges in the usual short notation', () => {
+    expect(formatRange(classRange('QQ+').classes)).toBe('QQ+');
+    expect(formatRange(classRange('AA').classes)).toBe('AA');
+    expect(formatRange(classRange('22-JJ').classes)).toBe('22-JJ');
+    expect(formatRange(classRange('77').classes)).toBe('77');
+    expect(formatRange(classRange('AQs+').classes)).toBe('AQs+');
+    expect(formatRange(classRange('AKs').classes)).toBe('AKs');
+    expect(formatRange(classRange('A2s-A5s').classes)).toBe('A2s-A5s');
+    expect(formatRange(classRange('KTo+, 54s, AK').classes)).toBe('AKs, 54s, AKo, KTo+');
+    expect(formatRange([])).toBe('');
+  });
+
+  it('round-trips random sets of hand classes', () => {
+    let seed = 7;
+    const next = () => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed / 2147483648;
+    };
+    for (let t = 0; t < 200; t++) {
+      const chosen = new Set<string>();
+      const density = next();
+      for (let row = 0; row < 13; row++) for (let col = 0; col < 13; col++) if (next() < density) chosen.add(gridLabel(row, col));
+      const text = formatRange(chosen);
+      const back = classRange(text);
+      expect(back.partial).toEqual([]);
+      expect([...back.classes].sort()).toEqual([...chosen].sort());
+    }
+  });
+
+  it('builds combos from classes without dead cards', () => {
+    expect(classesToCombos(['AA', 'KQo'])).toHaveLength(18);
+    expect(classesToCombos(['AA'], parseCards('As'))).toHaveLength(3);
   });
 });
