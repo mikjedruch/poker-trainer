@@ -713,7 +713,8 @@ h2 {
   background: var(--color-surface-2);
 }
 
-.segmented button {
+.segmented button,
+.segmented a {
   min-height: var(--control-height);
   border: 0;
   border-radius: var(--radius-sm);
@@ -723,6 +724,13 @@ h2 {
   cursor: pointer;
 }
 
+.segmented a {
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+}
+
+.segmented a[aria-current='page'],
 .segmented button[aria-pressed='true'] {
   background: var(--color-accent);
   color: var(--color-on-accent);
@@ -835,4 +843,208 @@ h2 {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ---------- range grid (13×13) ---------- */
+
+.range-grid {
+  display: grid;
+  gap: var(--grid-gap);
+  width: 100%;
+  user-select: none;
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: var(--grid-gap);
+}
+
+.range-cell {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--grid-radius);
+  font: inherit;
+  font-size: var(--grid-font-size);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+button.range-cell {
+  cursor: pointer;
+}
+
+.range-cell.raise {
+  background: var(--color-action-raise);
+  color: var(--color-on-raise);
+}
+.range-cell.call {
+  background: var(--color-action-call);
+  color: var(--color-on-call);
+}
+.range-cell.fold {
+  background: var(--color-action-fold);
+  color: var(--color-on-fold);
+}
+.range-cell.check {
+  background: var(--color-action-check);
+  color: var(--color-on-check);
+}
+
+.range-cell.marked {
+  outline: var(--grid-mark-width) solid var(--color-grid-mark);
+  outline-offset: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.range-legend {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.range-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-label {
+  font-weight: 600;
+}
+
+.legend-value {
+  margin-left: auto;
+  color: var(--color-text-muted);
+}
+
+.legend-swatch {
+  width: var(--legend-swatch);
+  height: var(--legend-swatch);
+  border-radius: var(--grid-radius);
+  flex: none;
+}
+.legend-swatch.raise {
+  background: var(--color-action-raise);
+}
+.legend-swatch.call {
+  background: var(--color-action-call);
+}
+.legend-swatch.fold {
+  background: var(--color-action-fold);
+}
+.legend-swatch.check {
+  background: var(--color-action-check);
+}
+
+/* ---------- preflop ---------- */
+
+.tabs {
+  margin-bottom: var(--space-3);
+}
+
+.select-field {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.spot-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--panel-padding);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+}
+
+.spot-hand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.spot-history {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.spot-hand {
+  justify-content: flex-start;
+}
+
+/* On short phones the table shrinks so the cards stay above the answer buttons without scrolling. */
+.spot-card .poker-table {
+  max-width: max(var(--table-min-width), calc((100dvh - var(--drill-chrome-height)) * 10 / 8.5));
+  margin-inline: auto;
+}
+
+.spot-hand .card-row {
+  flex: none;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* Always one line, so the grid below does not jump when a hand is tapped. */
+.cell-summary {
+  margin: var(--space-3) 0 var(--space-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-note {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.range-legend li {
+  flex-wrap: wrap;
+}
+
+.legend-range {
+  flex-basis: 100%;
+  padding-left: calc(var(--legend-swatch) + var(--space-2));
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.cell-detail h2 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+/* Up to three answer buttons with amounts ("Raise do $16") side by side. */
+.bar-row .btn.option {
+  padding: 0 var(--space-2);
+  line-height: 1.15;
+  font-size: var(--font-size-md);
+}
+
+.bar-stack {
+  display: grid;
+  gap: var(--space-2);
 }

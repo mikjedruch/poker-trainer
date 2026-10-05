@@ -1,0 +1,85 @@
+{
+  "about": "Baseline preflop ranges for live 6-max $1/$2, 100bb. Pure strategies: every hand has exactly one action. Edit ranges here; the code only reads them. Hands not listed get the scenario's 'rest' action.",
+  "stakes": { "smallBlind": 1, "bigBlind": 2, "stack": 200 },
+  "sizes": {
+    "villainOpen": 7,
+    "villainThreeBetInPosition": 25,
+    "villainThreeBetFromBlinds": 30,
+    "open": 8,
+    "openFromSmallBlind": 10,
+    "isolateOneLimper": 12,
+    "isolatePerExtraLimper": 4,
+    "isolateFromBlindsExtra": 3,
+    "threeBetInPosition": 25,
+    "threeBetOutOfPosition": 30,
+    "fourBet": 65
+  },
+  "scenarios": [
+    { "id": "RFI_UTG", "raise": "66+, A9s+, A5s-A4s, KTs+, QTs+, JTs, T9s, AJo+, KQo", "call": "", "rest": "fold" },
+    { "id": "RFI_HJ", "raise": "55+, A8s+, A5s-A2s, K9s+, Q9s+, J9s+, T9s, 98s, 87s, ATo+, KJo+", "call": "", "rest": "fold" },
+    {
+      "id": "RFI_CO",
+      "raise": "22+, A2s+, K7s+, Q8s+, J8s+, T8s+, 97s+, 86s+, 76s, 65s, A9o+, KTo+, QTo+, JTo",
+      "call": "",
+      "rest": "fold"
+    },
+    {
+      "id": "RFI_BTN",
+      "raise": "22+, A2s+, K5s+, Q7s+, J7s+, T7s+, 96s+, 86s+, 75s+, 64s+, 54s, A5o+, K9o+, Q9o+, J9o+, T9o",
+      "call": "",
+      "rest": "fold"
+    },
+    {
+      "id": "RFI_SB",
+      "raise": "22+, A2s+, K8s+, Q9s+, J9s+, T8s+, 98s, 87s, 76s, 65s, A8o+, KTo+, QJo",
+      "call": "",
+      "rest": "fold"
+    },
+    {
+      "id": "LIMP1_IP",
+      "raise": "77+, ATs+, KJs+, QJs, AJo+, KQo",
+      "call": "22-66, A2s-A9s, K9s-KTs, Q9s-QTs, J9s-JTs, T8s-T9s, 97s-98s, 86s-87s, 76s, 65s, 54s",
+      "rest": "fold"
+    },
+    {
+      "id": "LIMP2_IP",
+      "raise": "88+, AJs+, KQs, AQo+",
+      "call": "22-77, A2s-ATs, KTs-KJs, QTs-QJs, J9s-JTs, T8s-T9s, 97s-98s, 86s-87s, 75s-76s, 64s-65s, 54s",
+      "rest": "fold"
+    },
+    {
+      "id": "LIMP_SB",
+      "raise": "99+, AJs+, KQs, AQo+",
+      "call": "22-88, A2s-ATs, K9s-KJs, Q9s-QJs, J9s-JTs, T8s-T9s, 97s-98s, 86s-87s, 75s-76s, 64s-65s, 54s, ATo-AJo, KJo-KQo, QJo",
+      "rest": "fold"
+    },
+    { "id": "LIMP_BB", "raise": "TT+, AQs+, AKo", "call": "", "rest": "check" },
+    {
+      "id": "VS_EARLY_IP",
+      "raise": "QQ+, AK",
+      "call": "22-JJ, ATs-AQs, KJs-KQs, QJs, JTs, T9s, 98s, AQo",
+      "rest": "fold"
+    },
+    {
+      "id": "VS_LATE_BTN",
+      "raise": "JJ+, AQs+, AQo+",
+      "call": "22-TT, A2s-AJs, KTs+, QTs+, J9s+, T9s, 98s, 87s, 76s, 65s, AJo, KQo",
+      "rest": "fold"
+    },
+    { "id": "VS_OPEN_SB", "raise": "QQ+, AK, AQs", "call": "22-JJ, ATs-AJs, KJs-KQs, QJs, JTs, T9s, 98s", "rest": "fold" },
+    {
+      "id": "BB_VS_EARLY",
+      "raise": "QQ+, AK",
+      "call": "22-JJ, A2s-AQs, K9s+, Q9s+, J9s+, T8s+, 97s+, 86s+, 75s+, 64s+, 54s, AJo-AQo, KJo-KQo",
+      "rest": "fold"
+    },
+    {
+      "id": "BB_VS_LATE",
+      "raise": "JJ+, AQs+, AQo+",
+      "call": "22-TT, A2s-AJs, K5s+, Q7s+, J7s+, T7s+, 96s+, 85s+, 74s+, 63s+, 53s+, 43s, A7o-AJo, K9o+, Q9o+, J9o+, T9o, 98o",
+      "rest": "fold"
+    },
+    { "id": "VS3B_IP", "raise": "KK+, AKs", "call": "TT-QQ, AKo, AQs, AJs, KQs", "rest": "fold" },
+    { "id": "VS3B_OOP", "raise": "KK+, AKs", "call": "JJ-QQ, AKo, AQs", "rest": "fold" }
+  ]
+}

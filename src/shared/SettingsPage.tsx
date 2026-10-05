@@ -4,28 +4,9 @@ import type { SeatInfo } from './PokerTable';
 import { PokerTable } from './PokerTable';
 import { CardRow } from './PlayingCard';
 import { href } from './router';
+import { Segmented } from './Segmented';
 import type { Deck, Theme } from './settings';
 import { updateSettings, useSettings } from './settings';
-
-function Segmented<T extends string>({
-  options,
-  value,
-  onChange,
-}: {
-  options: ReadonlyArray<[T, string]>;
-  value: T;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div className="segmented">
-      {options.map(([v, label]) => (
-        <button key={v} type="button" aria-pressed={v === value} onClick={() => onChange(v)}>
-          {label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 const THEMES: ReadonlyArray<[Theme, string]> = [
   ['dark', 'Ciemny'],

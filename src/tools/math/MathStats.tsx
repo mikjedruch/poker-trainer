@@ -1,22 +1,19 @@
 import { useState } from 'react';
 import { TASK_INFO, TASK_TYPES } from '../../core/math/tasks';
 import { href } from '../../shared/router';
+import { ResetStats, StatsRow, percent } from '../../shared/StatsList';
 import { readJson, writeJson } from '../../shared/storage';
 import type { Progress } from './progress';
-import { PROGRESS_KEY, emptyProgress, recentAccuracy, sanitizeProgress, typeWeight } from './progress';
-
-const percent = (x: number) => `${Math.round(x * 100)}%`;
+import { PROGRESS_KEY, emptyProgress, sanitizeProgress, typeWeight } from './progress';
 
 export function MathStats() {
   const [progress, setProgress] = useState<Progress>(() => sanitizeProgress(readJson(PROGRESS_KEY)));
-  const [confirmReset, setConfirmReset] = useState(false);
   const totalWeight = TASK_TYPES.reduce((sum, t) => sum + typeWeight(progress[t]), 0);
 
   function reset() {
     const empty = emptyProgress();
     writeJson(PROGRESS_KEY, empty);
     setProgress(empty);
-    setConfirmReset(false);
   }
 
   return (
@@ -34,47 +31,17 @@ export function MathStats() {
       </p>
 
       <ul className="stats-list">
-        {TASK_TYPES.map((t) => {
-          const s = progress[t];
-          const acc = recentAccuracy(s);
-          return (
-            <li key={t} className="stats-item">
-              <div className="stats-head">
-                <strong>
-                  {TASK_INFO[t].number}. {TASK_INFO[t].title}
-                </strong>
-                <span className="stats-acc">{acc === null ? '—' : percent(acc)}</span>
-              </div>
-              <div className="bar" aria-hidden="true">
-                <div className="bar-fill" style={{ width: acc === null ? '0%' : percent(acc) }} />
-              </div>
-              <div className="stats-meta muted">
-                {acc === null
-                  ? 'Jeszcze nie ćwiczone'
-                  : `Ostatnie ${s.recent.length}: ${s.recent.filter(Boolean).length} dobrze · łącznie ${s.correct}/${s.attempts}`}
-                {' · '}szansa {percent(typeWeight(s) / totalWeight)}
-              </div>
-            </li>
-          );
-        })}
+        {TASK_TYPES.map((t) => (
+          <StatsRow
+            key={t}
+            title={`${TASK_INFO[t].number}. ${TASK_INFO[t].title}`}
+            stats={progress[t]}
+            note={`szansa ${percent(typeWeight(progress[t]) / totalWeight)}`}
+          />
+        ))}
       </ul>
 
-      <div className="reset-area">
-        {confirmReset ? (
-          <div className="btn-pair">
-            <button className="btn secondary" onClick={() => setConfirmReset(false)}>
-              Anuluj
-            </button>
-            <button className="btn danger" onClick={reset}>
-              Tak, wyzeruj
-            </button>
-          </div>
-        ) : (
-          <button className="btn secondary wide" onClick={() => setConfirmReset(true)}>
-            Wyzeruj statystyki
-          </button>
-        )}
-      </div>
+      <ResetStats onReset={reset} />
     </div>
   );
 }

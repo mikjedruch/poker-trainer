@@ -2,10 +2,13 @@ import { href, useHashPath } from './shared/router';
 import { SettingsPage } from './shared/SettingsPage';
 import { MathTrainer } from './tools/math/MathTrainer';
 import { MathStats } from './tools/math/MathStats';
+import { PreflopDrill } from './tools/preflop/PreflopDrill';
+import { PreflopStats } from './tools/preflop/PreflopStats';
+import { RangeBrowser } from './tools/preflop/RangeBrowser';
 
 const TOOLS = [
   { path: '/math', title: 'Matematyka', description: 'Outy, equity, pot odds, MDF, implied odds', ready: true },
-  { path: '/preflop', title: 'Preflop', description: 'Zakresy otwarć i obrony', ready: false },
+  { path: '/preflop', title: 'Preflop', description: 'Open, limperzy, obrona, 3bety · przeglądarka zakresów', ready: true },
   { path: '/postflop', title: 'Postflop', description: 'Decyzje na flopie, turnie i riverze', ready: false },
   { path: '/rules', title: 'Zasady', description: 'Przepisy i sytuacje przy stole live', ready: false },
 ];
@@ -47,6 +50,9 @@ export function App() {
   const path = useHashPath();
   if (path === '/math') return <MathTrainer />;
   if (path === '/math/stats') return <MathStats />;
+  if (path === '/preflop') return <PreflopDrill />;
+  if (path === '/preflop/zakresy') return <RangeBrowser />;
+  if (path === '/preflop/stats') return <PreflopStats />;
   if (path === '/settings') return <SettingsPage />;
   return <Home />;
 }
